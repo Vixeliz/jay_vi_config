@@ -1,6 +1,12 @@
-use jay_config::keyboard::{
-    mods::MOD4,
-    syms::{SYM_Return, SYM_b, SYM_space},
+use {
+    battery::units::Ratio,
+    jay_config::{
+        keyboard::{
+            mods::MOD4,
+            syms::{SYM_Return, SYM_b, SYM_space, SYM_1, SYM_2, SYM_3, SYM_4, SYM_5, SYM_6},
+        },
+        Workspace,
+    },
 };
 
 use {
@@ -46,6 +52,20 @@ fn configure_seat(s: Seat) {
     s.bind(MOD | SYM_j, move || s.focus(Down));
     s.bind(MOD | SYM_k, move || s.focus(Up));
     s.bind(MOD | SYM_l, move || s.focus(Right));
+
+    s.bind(MOD | SYM_1, move || s.show_workspace(Workspace(1)));
+    s.bind(MOD | SYM_2, move || s.show_workspace(Workspace(2)));
+    s.bind(MOD | SYM_3, move || s.show_workspace(Workspace(3)));
+    s.bind(MOD | SYM_4, move || s.show_workspace(Workspace(4)));
+    s.bind(MOD | SYM_5, move || s.show_workspace(Workspace(5)));
+    s.bind(MOD | SYM_6, move || s.show_workspace(Workspace(6)));
+
+    s.bind(MOD | SHIFT | SYM_1, move || s.set_workspace(Workspace(1)));
+    s.bind(MOD | SHIFT | SYM_2, move || s.set_workspace(Workspace(2)));
+    s.bind(MOD | SHIFT | SYM_3, move || s.set_workspace(Workspace(3)));
+    s.bind(MOD | SHIFT | SYM_4, move || s.set_workspace(Workspace(4)));
+    s.bind(MOD | SHIFT | SYM_5, move || s.set_workspace(Workspace(5)));
+    s.bind(MOD | SHIFT | SYM_6, move || s.set_workspace(Workspace(6)));
 
     s.bind(MOD | SHIFT | SYM_h, move || s.move_(Left));
     s.bind(MOD | SHIFT | SYM_j, move || s.move_(Down));
@@ -152,18 +172,21 @@ fn setup_status() {
         .with_cpu(CpuRefreshKind::new().with_cpu_usage())
         .with_memory();
     let system = RefCell::new(System::new_with_specifics(specifics));
+    let manager = battery::Manager::new().unwrap();
     let update_status = move || {
         let mut system = system.borrow_mut();
         system.refresh_specifics(specifics);
         let cpu_usage = system.cpus().iter().map(|cpu| cpu.cpu_usage()).sum::<f32>() / 100.0;
         let used = system.used_memory() as f64 / (1024 * 1024) as f64;
         let total = system.total_memory() as f64 / (1024 * 1024) as f64;
+        let battery = manager.batteries().unwrap().next().unwrap().unwrap();
         let status = format!(
-            r##"MEM: {:.1}/{:.1} <span color="#333333">|</span> CPU: {:5.2} <span color="#333333">|</span> {}"##,
+            r##"MEM: {:.1}/{:.1} <span color="#333333">|</span> CPU: {:5.2} <span color="#333333">|</span> {} <span> BAT: {:?} </span>"##,
             used,
             total,
             cpu_usage,
-            Local::now().format_with_items(time_format.iter())
+            Local::now().format_with_items(time_format.iter()),
+            battery.state_of_charge() * Ratio::new::<battery::units::ratio::ratio>(100.0)
         );
         set_status(&status);
     };
