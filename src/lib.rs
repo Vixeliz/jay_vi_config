@@ -1,3 +1,5 @@
+use jay_config::theme::Color;
+
 use {
     battery::units::Ratio,
     jay_config::{
@@ -5,6 +7,7 @@ use {
             mods::MOD4,
             syms::{SYM_Return, SYM_b, SYM_space, SYM_1, SYM_2, SYM_3, SYM_4, SYM_5, SYM_6},
         },
+        theme::{colors::Colorable, set_color},
         Workspace,
     },
 };
@@ -101,7 +104,63 @@ fn configure_seat(s: Seat) {
     };
     s.bind(MOD | SYM_y, move || delta(STEP));
     s.bind(MOD | SYM_i, move || delta(-STEP));
-
+    for i in 1..=13 {
+        match i {
+            1 => {
+                // Unfocused Title Bg
+                Colorable(i).set_color(Color::new(50, 50, 50));
+            }
+            2 => {
+                // Focused Title Bg
+                Colorable(i).set_color(Color::new(175, 175, 175));
+            }
+            3 => {
+                // Focused Inactive Bg
+                Colorable(i).set_color(Color::new(100, 100, 100));
+            }
+            4 => {
+                // Desktop Bg
+                Colorable(i).set_color(Color::new(30, 30, 30));
+            }
+            5 => {
+                // Bar Bg
+                Colorable(i).set_color(Color::new(25, 25, 25));
+            }
+            6 => {
+                // Separator Col
+                Colorable(i).set_color(Color::new(50, 50, 50));
+            }
+            7 => {
+                // Border color
+                Colorable(i).set_color(Color::new(75, 75, 75));
+            }
+            8 => {
+                // Unfocused Text Color
+                Colorable(i).set_color(Color::new(255, 255, 255));
+            }
+            9 => {
+                // Focused Text Color
+                Colorable(i).set_color(Color::new(0, 0, 0));
+            }
+            10 => {
+                // Focused Inactive Text Color
+                Colorable(i).set_color(Color::new(200, 200, 200));
+            }
+            11 => {
+                // Bar Status Text Color
+                Colorable(i).set_color(Color::new(255, 255, 255));
+            }
+            12 => {
+                // Captured Unfocused Title Bg
+                Colorable(i).set_color(Color::new(25, 25, 25));
+            }
+            13 => {
+                // Captured Focused Title Bg
+                Colorable(i).set_color(Color::new(75, 75, 75));
+            }
+            _ => {}
+        }
+    }
     let use_hc = Cell::new(true);
     s.bind(MOD | SHIFT | SYM_m, move || {
         let hc = !use_hc.get();
@@ -135,12 +194,13 @@ fn setup_seats() {
     configure_seat(seat);
     let handle_input_device = move |device: InputDevice| {
         if device.has_capability(CAP_POINTER) {
-            device.set_left_handed(true);
+            device.set_left_handed(false);
             device.set_transform_matrix([[0.35, 0.0], [0.0, 0.35]]);
         }
         device.set_tap_enabled(true);
         device.set_seat(seat);
     };
+
     input_devices().into_iter().for_each(handle_input_device);
     on_new_input_device(handle_input_device);
 }
