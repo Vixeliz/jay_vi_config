@@ -89,7 +89,37 @@ fn configure_seat(s: Seat) {
     let alacritty = || Command::new("alacritty").spawn();
     s.bind(MOD | SYM_Return, alacritty);
 
-    s.bind(MOD | SYM_d, || Command::new("bemenu-run").spawn());
+    // s.bind(MOD | SYM_d, || Command::new(r#"bemenu-run -i -l 20 --fb '#212121' --ff '#ffffff' --nb '#212121' --nf '#ffffff' --tb '#212121' --hb '#ffffff' --tf '#ffffff' --hf '#212121' --nf '#ffffff' --af '#ffffff' --ab '#212121'"#).spawn());
+    let menu = || {
+        Command::new("bemenu-run")
+            .arg("-i")
+            .arg("-l")
+            .arg("20")
+            .arg("--fb")
+            .arg(r#"#212121"#)
+            .arg("--ff")
+            .arg(r#"#ffffff"#)
+            .arg("--nb")
+            .arg(r#"#212121"#)
+            .arg("--nf")
+            .arg(r#"#ffffff"#)
+            .arg("--tb")
+            .arg(r#"#212121"#)
+            .arg("--hb")
+            .arg(r#"#ffffff"#)
+            .arg("--tf")
+            .arg(r#"#ffffff"#)
+            .arg("--hf")
+            .arg(r#"#212121"#)
+            .arg("--nf")
+            .arg(r#"#ffffff"#)
+            .arg("--af")
+            .arg("'#ffffff'")
+            .arg("--ab")
+            .arg("'#212121'")
+            .spawn()
+    };
+    s.bind(MOD | SYM_d, menu);
 
     s.bind(MOD | SHIFT | SYM_e, quit);
     s.bind(MOD | SHIFT | SYM_r, reload);
